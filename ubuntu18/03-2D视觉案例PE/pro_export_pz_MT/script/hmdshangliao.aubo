@@ -1,0 +1,92 @@
+-- 最大速度设置
+set_joint_maxvelc({1,1,1,1,1,1})
+set_joint_maxacc({1,1,1,1,1,1})
+set_end_maxvelc(1)
+set_end_maxacc(1)
+
+------------------------------------------------------------
+--配置模板--"hvisionModel|QQ1."
+--配置开环/闭环--"hclosevision|"
+--触发视觉拍照部分
+script_common_interface("AuboVision","hvisionModel|CNC_3_1.")
+script_common_interface("AuboVision", "hclosevision|")
+resp_from_camera=nil
+while (resp_from_camera ~= 1) do
+    sleep(0.05)
+    resp_from_camera = script_common_interface("AuboVision", "gethvision_status|")
+    print("resp_from_camera :"..tostring(resp_from_camera))
+    if (resp_from_camera == 0) then
+        popup_message(2, "Excessice Deviation", true)
+        break
+    end
+    if (resp_from_camera == -1) then
+        popup_message(2, "Verification Fail", true)
+        break
+    end
+    if (resp_from_camera == -2) then
+        popup_message(2, "Verification Stop", true)
+        break
+    end
+end
+sleep(0.05)
+------------------------------------------------------------
+--视觉伺服--直线运动函数
+function ServoLine(V_P_Point)
+	--获取变量点的正解
+	pos,ori = base_to_user(get_global_variable(V_P_Point),{0,0,0},{1,0,0,0})
+	pos_X=pos[1]
+	pos_Y=pos[2]
+	pos_Z=pos[3]
+	ori_w=ori[1]
+	ori_x=ori[2]
+	ori_y=ori[3]
+	ori_z=ori[4]
+	rpy={}
+	--四元数转换为欧拉角
+	rpy=quaternion2rpy({ori_w,ori_x,ori_y,ori_z})
+	RX=rpy[1]
+	RY=rpy[2]
+	RZ=rpy[3]
+	-- 执行直线运动
+	local command = string.format("hposechange|%f,%f,%f,%f,%f,%f",pos_X,pos_Y,pos_Z,RX,RY,RZ)
+	local result = script_common_interface("AuboVision", command)
+	move_line(result, true)
+end
+
+------------------------------------------------------------
+--视觉伺服--关节运动
+function ServoJoint(V_P_Point)
+	--获取变量点
+	Table_Point=get_global_variable(V_P_Point)
+	joint1=Table_Point[1]
+	joint2=Table_Point[2]
+	joint3=Table_Point[3]
+	joint4=Table_Point[4]
+	joint5=Table_Point[5]
+	joint6=Table_Point[6]
+	-- 执行关节运动
+	local command = string.format("hjointchange|%f,%f,%f,%f,%f,%f", joint1, joint2, joint3, joint4, joint5, joint6)
+	local result = script_common_interface("AuboVision", command)
+	move_joint(result, true)
+end
+
+------------------------------------------------------------
+------------------------------------------------------------
+
+--混搭运行
+--配置变量点作为目标示教位置
+--ServoJoint("V_P_q1")
+--ServoJoint("V_P_q2")
+ServoJoint("V_P_pguodu1")
+
+ServoLine("V_P_p3")
+sleep(1)
+set_relative_offset({0, 0, 0.005})
+ServoLine("V_P_p4")
+sleep(1)
+script_common_interface("JODELL_Tools", "1|RG|RG75_300|Open")
+sleep(2)
+ServoLine("V_P_p3")
+sleep(1)
+ServoJoint("V_P_pguodu1")
+ServoJoint("V_P_start")

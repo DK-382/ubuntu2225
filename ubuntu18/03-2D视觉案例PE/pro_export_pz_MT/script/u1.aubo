@@ -1,0 +1,5 @@
+port = 503
+ip = "192.168.1.103"
+tcp.client.connect(ip,port)
+msg="req-taskStatus:101@agvNo:001@currentStorateCode:A01-01-01"
+tcp.client.send_str_data(ip,port,msg)

@@ -1,0 +1,5 @@
+a=get_modbus_io_status("M_F_X")
+b=get_modbus_io_status("M_F_Y")
+
+set_global_variable("V_D_SX",a*1000)
+set_global_variable("V_D_SY",b*1000)

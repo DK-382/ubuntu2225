@@ -1,0 +1,78 @@
+-- define a function to transform position and orientatio to transformation matrix
+-- pos is a table with three elements {x, y, z}
+-- ori is a table with four elements {w, x, y, z}
+function quaternionToTransormationMatrix(pos, ori)
+    local mat = {}
+    
+    local w = ori[1]
+    local x = ori[2]
+    local y = ori[3]
+    local z = ori[4]
+
+    local xx = x * x 
+    local xy = x * y
+    local xz = x * z
+    local xw = x * w
+
+    local yy = y * y
+    local yz = y * z
+    local yw = y * w
+
+    local zz = z * z
+    local zw = z * w
+
+    mat[1] = 1 - 2 * (yy + zz)
+    mat[2] = 2 * (xy + zw)
+    mat[3] = 2 * (xz - yw)
+    mat[4] = pos[1]
+
+    mat[5] = 2 * (xy - zw)
+    mat[6] = 1 - 2 * (xx + zz)
+    mat[7] = 2 * (yz + xw)
+    mat[8] = pos[2]
+
+    mat[9] = 2 * (xz + yw)
+    mat[10] = 2 * (yz - xw)
+    mat[11] = 1- 2 * (xx + yy)
+    mat[12] = pos[3]
+
+    mat[13] = 0
+    mat[14] = 0
+    mat[15] = 0
+    mat[16] = 1
+    
+    return mat
+end
+-- forward kinematics before collision
+-- calculate the position and orientation of flange center in base coordinate
+pos1, ori1 = base_to_user({-0.273821, 0.7723, -2.34757, -1.825, -1.48038, -0.150308})
+
+print(string.format("%6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f", pos1[1], pos1[2], pos1[3], ori1[1], ori1[2], ori1[3], ori1[4]))
+
+TransMatrix1 = quaternionToTransormationMatrix(pos1, ori1)
+print("TransMatrix1 : ")
+print("["..tostring(TransMatrix1[1])..", "..tostring(TransMatrix1[2])..", " ..tostring(TransMatrix1[3])..", "..tostring(TransMatrix1[4]).."]")
+print("["..tostring(TransMatrix1[5])..", "..tostring(TransMatrix1[6])..", " ..tostring(TransMatrix1[7])..", "..tostring(TransMatrix1[8]).."]")
+print("["..tostring(TransMatrix1[9])..", "..tostring(TransMatrix1[10])..", " ..tostring(TransMatrix1[11])..", "..tostring(TransMatrix1[12]).."]")
+print("["..tostring(TransMatrix1[13])..", "..tostring(TransMatrix1[14])..", " ..tostring(TransMatrix1[15])..", "..tostring(TransMatrix1[16]).."]")
+
+-- forward kinematics after collision
+-- calculate the position and orientation of flange center in base coordinate
+pos2, ori2 = base_to_user({-0.253344, 0.775215,-2.3432, -1.83305, -1.55132, -0.139726})                                                                                                                                                                             
+print(string.format("%6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f", pos2[1], pos2[2], pos2[3], ori2[1], ori2[2], ori2[3], ori2[4]))
+
+TransMatrix2 = quaternionToTransormationMatrix(pos2, ori2)
+print("TransMatrix2 : ")
+print("["..tostring(TransMatrix2[1])..", "..tostring(TransMatrix2[2])..", " ..tostring(TransMatrix2[3])..", "..tostring(TransMatrix2[4]).."]")
+print("["..tostring(TransMatrix2[5])..", "..tostring(TransMatrix2[6])..", " ..tostring(TransMatrix2[7])..", "..tostring(TransMatrix2[8]).."]")
+print("["..tostring(TransMatrix2[9])..", "..tostring(TransMatrix2[10])..", " ..tostring(TransMatrix2[11])..", "..tostring(TransMatrix2[12]).."]")
+print("["..tostring(TransMatrix2[13])..", "..tostring(TransMatrix2[14])..", " ..tostring(TransMatrix2[15])..", "..tostring(TransMatrix2[16]).."]")
+
+print(pos2[1] - pos1[1])
+print(pos2[2] - pos1[2])
+print(pos2[3] - pos1[3])
+
+print(ori2[1] - ori1[1])
+print(ori2[2] - ori1[2])
+print(ori2[3] - ori1[3])
+print(ori2[4] - ori1[4])

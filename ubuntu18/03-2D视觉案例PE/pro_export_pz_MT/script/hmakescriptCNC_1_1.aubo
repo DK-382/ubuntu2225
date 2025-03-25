@@ -1,0 +1,40 @@
+set_joint_maxvelc({1,1,1,1,1,1})
+set_joint_maxacc({1,1,1,1,1,1})
+set_end_maxvelc(1)
+set_end_maxacc(1)
+script_common_interface("AuboVision","hvisionModel|CNC_1_1.")
+script_common_interface("AuboVision", "hclosevision|")
+resp_from_camera=nil
+while (resp_from_camera ~= 1) do
+    sleep(0.05)
+    resp_from_camera = script_common_interface("AuboVision", "gethvision_status|")
+    print("resp_from_camera :"..tostring(resp_from_camera))
+    if (resp_from_camera == 0) then
+        popup_message(2, "Excessice Deviation", true)
+        break
+    end
+    if (resp_from_camera == -1) then
+        popup_message(2, "Verification Fail", true)
+        break
+    end
+    if (resp_from_camera == -2) then
+        popup_message(2, "Verification Stop", true)
+        break
+    end
+end
+sleep(0.05)
+
+arm_move = script_common_interface("AuboVision", "hposechange|-0.192419,-0.669327,0.18735,3.13603,0.00220891,-0.0278963")
+
+set_relative_offset({0.001, -0.015, 0.079})
+move_line(arm_move, true)
+
+set_relative_offset({0.001, -0.015, 0.01})
+move_line(arm_move, true)
+sleep(0.5)
+--script_common_interface("EG2_4B","gripper_positionset|1")
+local ret = script_common_interface("JODELL_Tools", "1|RG|RG52_050|Close")
+sleep(0.5)
+
+set_relative_offset({0.001, -0.015, 0.079})
+move_line(arm_move, true)

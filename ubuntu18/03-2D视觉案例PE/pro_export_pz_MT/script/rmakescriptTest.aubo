@@ -1,0 +1,27 @@
+set_joint_maxvelc({1,1,1,1,1,1})
+set_joint_maxacc({1,1,1,1,1,1})
+set_end_maxvelc(1)
+set_end_maxacc(1)
+script_common_interface("AuboVision","rvisionModel|Test.")
+script_common_interface("AuboVision", "ropenvision|")
+resp_from_camera=nil
+while (resp_from_camera ~= 1) do
+    sleep(0.05)
+    resp_from_camera = script_common_interface("AuboVision", "getrvision_status|")
+    print("resp_from_camera :"..tostring(resp_from_camera))
+    if (resp_from_camera == 0) then
+        popup_message(2, "Excessice Deviation", true)
+        break
+    end
+    if (resp_from_camera == -1) then
+        popup_message(2, "Verification Fail", true)
+        break
+    end
+    if (resp_from_camera == -2) then
+        popup_message(2, "Verification Stop", true)
+        break
+    end
+end
+sleep(0.05)
+move_joint(script_common_interface("AuboVision", "rjointchange|-1.6059,0.366794,-1.52903,-0.323524,-1.5987,-0.0186959"), true)
+move_joint(script_common_interface("AuboVision", "rjointchange|-1.6059,0.413118,-1.60606,-0.446872,-1.59869,-0.0186923"), true)

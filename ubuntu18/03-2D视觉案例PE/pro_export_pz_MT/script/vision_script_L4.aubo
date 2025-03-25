@@ -1,0 +1,82 @@
+function table2str(tab) --table格式转string格式函数
+    local str=""
+    for i=1,#tab,1 do
+        if(i==#tab) then
+             str=str..tostring(tab[i])
+        else
+            str=str..tostring(tab[i])..","
+        end
+    end
+    return  str
+end
+
+function joint2pose(jointList,V_P) --关节角转V_P_**变量的函数
+    local joint_str,pos_str,ori_str,pos,ori=""
+    pos,ori=base_to_user(jointList)
+    joint_str=table2str(jointList)
+    --print(joint_str)
+    pos_str=table2str(pos)
+    --print(pos_str)
+    ori_str=table2str(ori)
+    --print(ori_str)
+    set_global_variable(V_P,pos_str..","..ori_str..","..joint_str)
+    --print(pos_str..","..ori_str..","..joint_str)
+end
+
+--[[ 
+set_joint_maxvelc({1,1,1,1,1,1})    
+set_joint_maxacc({1,1,1,1,1,1})
+set_end_maxvelc(1)
+set_end_maxacc(1)
+]] --上面这部分不需要，删掉或者注释掉
+
+--[[mark_num=get_global_variable("V_I_mark_num") --V_I_***为判断模板编号
+if (mark_num == 1) then
+	mark="w1"           --mark1是创建的一号模板名称，一个mark对应一个模板
+elseif (mark_num == 2) then
+	mark="w2"		 --mark1是创建的一号模板名称，一个mark对应一个模板
+end]]--
+--[[					 
+	.                                --有多少模板就在后面增加多少elseif..
+	.
+	.
+]]	
+set_robot_io_status(RobotIOType.RobotBoardUserDO, "U_DO_00", 1)
+while (not (get_robot_io_status(RobotIOType.RobotBoardUserDO, "U_DO_00") == 1)) do
+    sleep(0.01)
+end
+script_common_interface("AuboVision","hvisionModel|L4.") --根据上面的模板编号，切换不同的模板
+--script_common_interface("AuboVision","hvisionModel|"..mark..".") --根据上面的模板编号，切换不同的模板
+script_common_interface("AuboVision", "hclosevision|")
+resp_from_camera=nil
+while (resp_from_camera ~= 1) do
+    sleep(0.05)
+    resp_from_camera = script_common_interface("AuboVision", "gethvision_status|")
+-- print("resp_from_camera :"..tostring(resp_from_camera))
+    if (resp_from_camera == 0) then  --视觉偏差过大
+        popup_message(2, "Excessice Deviation", true)
+        break
+    end
+    if (resp_from_camera == -1) then   --视觉验证失败
+
+        popup_message(2, "Verification Fail", true)
+        break
+    end
+    if (resp_from_camera == -2) then  --视觉验证停止
+        popup_message(2, "Verification Stop", true)
+        break
+    end
+end
+set_robot_io_status(RobotIOType.RobotBoardUserDO, "U_DO_00", 0)
+while (not (get_robot_io_status(RobotIOType.RobotBoardUserDO, "U_DO_00") == 0)) do
+    sleep(0.01)
+end
+sleep(0.05)
+W1_L1=table2str(get_global_variable("V_P_W1_L1"))  --获取保存于”V_P_W1_1“变量中的点位6关节角信息
+W1_L4=table2str(get_global_variable("V_P_W1_L4"))
+
+W11=script_common_interface("AuboVision", "hjointchange|"..W1_L1)    --将视觉矫正过的点位暂存于W11这个变量中，W11可以任意命名
+W12=script_common_interface("AuboVision", "hjointchange|"..W1_L4) 
+
+joint2pose(W11,"V_P_W1L1")  --通过上面声明的“joint2pose”函数，将W11 存储于在线编程配置的变量“V_P_W11”
+joint2pose(W12,"V_P_W1L4")

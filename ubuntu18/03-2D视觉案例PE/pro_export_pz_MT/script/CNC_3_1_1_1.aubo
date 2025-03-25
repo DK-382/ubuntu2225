@@ -1,0 +1,44 @@
+-- 导入dkjson模块
+local json = require("dkjson")
+
+-- 从modbus获取目标的机床信息
+-- 机床类型
+-- CncType = get_modbus_io_status("VarCncType")
+CncType = 3
+-- 机床号
+CncID = get_global_variable("V_I_CNCID")
+-- 机床点位
+-- VarCellID = get_modbus_io_status("VarCellID")
+VarCellID = 1
+-- 确定模板名称
+ModelName = "CNC_"..tostring(CncType).."_"..tostring(CncID)
+-- 选择对应模板
+ModelSelectionCommand = "hvisionModel|"..ModelName.."."
+script_common_interface("AuboVision", ModelSelectionCommand)
+
+-- 调用视觉验证功能
+script_common_interface("AuboVision", "hclosevision|")
+
+-- 检验验证结果
+resp_from_camera=nil
+while (resp_from_camera ~= 1) do
+    sleep(0.05)
+    resp_from_camera = script_common_interface("AuboVision", "gethvision_status|")
+    print("resp_from_camera :"..tostring(resp_from_camera))
+    if (resp_from_camera == 0) then
+        -- 偏差过大弹窗
+        popup_message(2, "Excessice Deviation", true)
+        break
+    end
+    if (resp_from_camera == -1) then
+        -- 验证失败弹窗
+        popup_message(2, "Verification Fail", true)
+        break
+    end
+    if (resp_from_camera == -2) then
+        -- 验证停止弹窗
+        popup_message(2, "Verification Stop", true)
+        break
+    end
+end
+

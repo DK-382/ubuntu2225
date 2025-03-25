@@ -1,0 +1,81 @@
+--分割字符串函数
+function string.split(str,delimiter)
+	if str  ==  nil or str ==  ''  or  delimiter  == nil then
+			return  nil
+	end
+	local  result =  {}
+	for match in  (str..delimiter):gmatch("(.-)"..delimiter) do
+			table.insert(result,match)
+	end
+	return result
+end
+--[[
+--通讯IP与端口设置
+port=6000
+ip="192.168.192.100"
+
+--本机作为客户端连接外部服务端
+tcp.client.connect(ip,port)
+
+--等待连接成功
+sleep(0.1)
+]]--
+--发送字符串为1，2
+send_str="100,1,0,2,-24.697,-644.366,57.375,178.521,0.385,-49.259,77.120,39.706,-94.627,-45.296,-91.186,36.365"
+tcp.client.send_str_data(ip,port,send_str)
+print("send ok")
+	recv_str = "0"	
+--接收并处理返回的数据
+recv_str=tcp.client.recv_str_data(ip,port)
+--while (1) do
+
+	recv_str=tcp.client.recv_str_data(ip,port)
+	cnt=0
+	print("recv_str = "..recv_str)
+
+--判断如果接收为0，则记为接收失败并记录，连续接收20次失败则报错返回
+	while (recv_str==nil or recv_str=='' or recv_str=="0") do    
+		--sleep(0.05)
+	     cnt = cnt+1
+		recv_str = tcp.client.recv_str_data(ip,port)
+		print("recv_str = "..recv_str)
+		if cnt>20 then
+			cnt=0
+			print("Receive error !")
+			set_global_variable("V_B_error",true)
+if recv_str ~=nil and recv_str~="0" then
+
+			break
+		end
+end
+
+
+--如果接收成功，即收到数据不为空或者0，则执行下面的操作
+		recv_str = tcp.client.recv_str_data(ip,port)
+		print("recv_str = "..recv_str)
+
+--分割字符串，以逗号为分隔符，打印收到的输出结果
+	table1 = string.split(recv_str,",")
+	print("recv_str = "..recv_str)
+
+
+
+--判断分析，如果第一个字符串为OK，则执行下面的条件语句。这里以设置相对偏移量为参考
+     	if(table1[1] == "OK") then
+		set_global_variable("V_D_dX",tonumber(table1[2]))
+		set_global_variable("V_D_dY",tonumber(table1[3]))
+          --print("= "..table1[2])
+       	set_global_variable("V_B_error",false)
+	print("偏移量X,Y设置成功")
+	sleep(0.05)
+
+	end
+end
+--判断分析，如果第一个字符串为NG，则执行下面的条件语句，赋值错误信息并返回给变量
+	if(table1[1] == "NG") then
+		print("no object!!! 收到 NG!")
+		set_global_variable("V_B_error",true)
+            --break
+	end
+--break
+--end

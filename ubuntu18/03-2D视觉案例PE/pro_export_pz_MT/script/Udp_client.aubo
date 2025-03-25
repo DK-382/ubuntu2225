@@ -1,0 +1,19 @@
+-- Udp client
+local socket = require("socket")
+
+udp = socket.udp()
+udp:setpeername("127.0.0.1", 8080)
+udp:settimeout(1)
+udp:send("Force")
+data = udp:receive()
+
+--print(data)
+--a = string.find(data, ",", 1)
+--print(a)
+if data~=nil then
+f1 = string.sub(data, 2, string.find(data, ",", 1)-1)
+else f1=0
+end
+set_global_variable("V_D_force", f1)
+sleep(0.1)
+print("force1: "..f1)

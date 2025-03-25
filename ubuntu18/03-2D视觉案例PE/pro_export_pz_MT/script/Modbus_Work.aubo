@@ -1,0 +1,4 @@
+A = get_global_variable("V_I_Work_num")
+A = A - 1
+set_global_variable("V_I_Work_num", A)
+set_modbus_io_status("Work", A)

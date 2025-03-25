@@ -1,0 +1,28 @@
+set_joint_maxvelc({1,1,1,1,1,1})
+set_joint_maxacc({1,1,1,1,1,1})
+set_end_maxvelc(1)
+set_end_maxacc(1)
+script_common_interface("AuboVision","hvisionModel|test1011.")
+script_common_interface("AuboVision", "hopenvision|")
+resp_from_camera=nil
+
+while(resp_from_camera == nil) do
+    sleep(0.05)
+    resp_from_camera = script_common_interface("AuboVision", "gethvision_status|")
+    print(tostring(resp_from_camera))
+end
+
+if (resp_from_camera == 1) then
+    --set_modbus_io_status("w_b31", 0)
+    --set_modbus_io_status("w_b32", 1)
+    sleep(0.05)
+    move_joint(script_common_interface("AuboVision", "hjointchange|-0.00142371,0.234848,-1.53955,0.207321,-1.64663,-1.62885"), true)
+    move_joint(script_common_interface("AuboVision", "hjointchange|-0.00142371,0.234848,-1.53955,0.207321,-1.64663,-1.62885"), true)
+    
+else
+    --set_modbus_io_status("w_b31", 1)
+    --set_modbus_io_status("w_b32", 0)
+    robot_slow_stop()
+    print(resp_from_camera)
+end
+

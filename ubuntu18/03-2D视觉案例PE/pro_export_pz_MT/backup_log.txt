@@ -1,0 +1,193 @@
+开始备份文件...
+备份目录：/root/auborobotstudio/robotstudio/teachpendant/share/teachpendant/database
+sending incremental file list
+database/
+database/authority.db
+database/config_info.db
+database/fixed_pose.db
+database/io_action.db
+database/io_initpos.db
+database/joint_offset.db
+database/security_config.db
+database/system_info.db
+database/tool_coord_param.db
+database/tool_io_config.db
+database/user_io_alias.db
+database/variable.db
+
+sent 308,194 bytes  received 248 bytes  616,884.00 bytes/sec
+total size is 307,200  speedup is 1.00
+备份成功：/root/auborobotstudio/robotstudio/teachpendant/share/teachpendant/database
+备份目录：/root/auborobotstudio/robotstudio/teachpendant/share/teachpendant/log
+sending incremental file list
+log/
+
+sent 47 bytes  received 20 bytes  134.00 bytes/sec
+total size is 0  speedup is 0.00
+备份成功：/root/auborobotstudio/robotstudio/teachpendant/share/teachpendant/log
+备份目录：/root/auborobotstudio/robotstudio/teachpendant/share/teachpendant/plugins/Modbus
+sending incremental file list
+Modbus/
+Modbus/version_update_log
+Modbus/Database/
+Modbus/Database/modbus.db
+Modbus/Database/modbusSlave.conf
+
+sent 21,715 bytes  received 89 bytes  43,608.00 bytes/sec
+total size is 21,402  speedup is 0.98
+备份成功：/root/auborobotstudio/robotstudio/teachpendant/share/teachpendant/plugins/Modbus
+备份目录：/root/auborobotstudio/robotstudio/teachpendant/share/teachpendant/procedure
+sending incremental file list
+procedure/
+procedure/A3_paizhao.aubo
+procedure/A3_paizhao.xml
+procedure/M_paizhao.aubo
+procedure/M_paizhao.xml
+
+sent 63,316 bytes  received 96 bytes  126,824.00 bytes/sec
+total size is 62,959  speedup is 0.99
+备份成功：/root/auborobotstudio/robotstudio/teachpendant/share/teachpendant/procedure
+备份目录：/root/auborobotstudio/robotstudio/teachpendant/share/teachpendant/project
+sending incremental file list
+project/
+
+sent 56 bytes  received 20 bytes  152.00 bytes/sec
+total size is 0  speedup is 0.00
+备份成功：/root/auborobotstudio/robotstudio/teachpendant/share/teachpendant/project
+备份目录：/root/auborobotstudio/robotstudio/teachpendant/share/teachpendant/script
+sending incremental file list
+script/
+script/BCNC2_1_1.aubo
+script/BCNC2_1_2.aubo
+script/BCNC2_2_1.aubo
+script/BCNC2_2_2.aubo
+script/BCNC2_2_CAM.aubo
+script/BCNC3_1_1.aubo
+script/BCNC3_1_2.aubo
+script/BCNC_1_1_1.aubo
+script/BCNC_1_1_2.aubo
+script/CNC_1_1.aubo
+script/CNC_1_1_1.aubo
+script/CNC_1_1_2.aubo
+script/CNC_1_2.aubo
+script/CNC_2_1_1.aubo
+script/CNC_2_1_2.aubo
+script/CNC_3_1_1.aubo
+script/CNC_3_1_1_1.aubo
+script/Cam.aubo
+script/Cam_CNC.aubo
+script/Cam_C_sl.aubo
+script/Cam_C_sxl.aubo
+script/Close.aubo
+script/GRtest.aubo
+script/HSL.aubo
+script/LM1.aubo
+script/LM2.aubo
+script/LOOP_SPLIT.aubo
+script/Modbus_Work.aubo
+script/Open.aubo
+script/RG75CLOSE.aubo
+script/RG75Open.aubo
+script/RG_CLOSE.aubo
+script/RG_OPEN.aubo
+script/RGclose.aubo
+script/SL.aubo
+script/Test.aubo
+script/Time_Stamp_AGV.aubo
+script/Time_Stamp_ARM.aubo
+script/Time_VISIO.aubo
+script/Udp_client.aubo
+script/Udp_client_tp.aubo
+script/VisionDemo.aubo
+script/VisionServo.aubo
+script/agv_test.aubo
+script/as485.aubo
+script/as485_close.aubo
+script/as485_open.aubo
+script/coord_B.aubo
+script/coord_S.aubo
+script/data.txt
+script/data_output.aubo
+script/dataold.txt
+script/demo.aubo
+script/hmakescript88888.aubo
+script/hmakescriptCNC1_1.aubo
+script/hmakescriptCNC_1_1.aubo
+script/hmakescriptCNC_1_2.aubo
+script/hmakescriptCNC_1_3.aubo
+script/hmakescriptCNC_1_4.aubo
+script/hmakescriptCNC_2_1.aubo
+script/hmakescriptCNC_2_2.aubo
+script/hmakescriptCNC_3_1.aubo
+script/hmakescriptGR.aubo
+script/hmakescriptGR1.aubo
+script/hmakescriptGR2.aubo
+script/hmakescriptGR3.aubo
+script/hmakescriptGR3_.aubo
+script/hmakescriptQ93.aubo
+script/hmakescriptSL.aubo
+script/hmakescriptaaa.aubo
+script/hmakescriptahsddhsjk.aubo
+script/hmakescriptaruco.aubo
+script/hmakescriptfshjc.aubo
+script/hmakescriptmodel530276a4.aubo
+script/hmakescriptmodel7b84648a.aubo
+script/hmakescriptmodela9ade7e8.aubo
+script/hmakescriptt0830.aubo
+script/hmakescripttest.aubo
+script/hmakescripttest1011.aubo
+script/hmakescripttest_.aubo
+script/hmakescripttest_pos.aubo
+script/hmakescripttest_pos_2.aubo
+script/hmd_1.aubo
+script/hmdshangliao.aubo
+script/hmdshangliao2.aubo
+script/hmdxialiao.aubo
+script/hmdxialiao2.aubo
+script/jo_t_c.aubo
+script/jo_t_o.aubo
+script/lua_test.aubo
+script/oldCNC_1_2.aubo
+script/paizhao.aubo
+script/pose212.aubo
+script/posetest.aubo
+script/quick_fix.aubo
+script/rmakescriptTest.aubo
+script/rmakescriptmodel0ef9ceaa.aubo
+script/shutdown.aubo
+script/shutdown16.aubo
+script/sss.aubo
+script/standard_value.aubo
+script/tcp.aubo
+script/tcp14.aubo
+script/tcp_connect.aubo
+script/tcp_ready.aubo
+script/tcp_recv.aubo
+script/tcp_send_recv.aubo
+script/tcp_set.aubo
+script/tcp_set1.aubo
+script/tcp_test1.aubo
+script/tcp_text2.aubo
+script/test_tcp_client.aubo
+script/test_tcp_shutdow.aubo
+script/u1.aubo
+script/untitled.aubo
+script/vision_script.aubo
+script/vision_script1.aubo
+script/vision_script2.aubo
+script/vision_script3.aubo
+script/vision_script4_1.aubo
+script/vision_script_L.aubo
+script/vision_script_L4.aubo
+script/vision_t0830.aubo
+script/拍照通信交互.aubo
+
+sent 481,312 bytes  received 2,376 bytes  967,376.00 bytes/sec
+total size is 472,341  speedup is 0.98
+备份成功：/root/auborobotstudio/robotstudio/teachpendant/share/teachpendant/script
+跳过目录：/root/auborobotstudio/robotstudio/teachpendant/share/teachpendant/resources
+跳过目录：/root/auborobotstudio/robotstudio/teachpendant/share/teachpendant/simulation
+跳过目录：/root/auborobotstudio/robotstudio/teachpendant/share/teachpendant/recordtrack
+跳过目录：/root/auborobotstudio/robotstudio/teachpendant/share/teachpendant/nc
+跳过目录：/root/auborobotstudio/robotstudio/teachpendant/share/teachpendant/offlinetrack
+将日志文件包含在备份中...

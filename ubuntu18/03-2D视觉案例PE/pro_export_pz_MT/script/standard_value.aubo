@@ -1,0 +1,34 @@
+set_joint_maxvelc({1,1,1,1,1,1})
+set_joint_maxacc({1,1,1,1,1,1})
+set_end_maxvelc(1)
+set_end_maxacc(1)
+script_common_interface("AuboVision","hvisionModel|standard.")
+script_common_interface("AuboVision", "hopenvision|")
+resp_from_camera=nil
+while (resp_from_camera ~= 1) do
+    sleep(0.05)
+    resp_from_camera = script_common_interface("AuboVision", "gethvision_status|")
+    print("resp_from_camera :"..tostring(resp_from_camera))
+    if (resp_from_camera == 0) then
+        popup_message(2, "Excessice Deviation", true)
+        break
+    end
+    if (resp_from_camera == -1) then
+        popup_message(2, "Verification Fail", true)
+        break
+    end
+    if (resp_from_camera == -2) then
+        popup_message(2, "Verification Stop", true)
+        break
+    end
+end
+sleep(0.05)
+visionresult  = script_common_interface("AuboVision", "hjointchange|-0.273821,0.7723,-2.34757,-1.825,-1.48038,-0.150308")
+for i  = 1,#visionresult,1 do
+    print(visionresult[i])
+end
+print("___________________")
+visionresult = script_common_interface("AuboVision", "hposechange|-0.436607,-0.0123856,-0.0473074,2.85502,-0.0451214,-1.67523")
+for i  = 1,#visionresult,1 do
+    print(visionresult[i])
+end

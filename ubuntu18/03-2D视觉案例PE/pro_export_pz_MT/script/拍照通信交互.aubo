@@ -1,0 +1,55 @@
+-- 分割字符串函数
+function string.split(str, delimiter)
+    if not str or str == "" or not delimiter then return nil end
+    local result = {}
+    for match in (str .. delimiter):gmatch("(.-)" .. delimiter) do
+        table.insert(result, match)
+    end
+    return result
+end
+
+-- 通讯 IP 与端口设置
+local port = 6000
+local ip = "192.168.80.122"
+
+-- 连接服务器
+tcp.client.connect(ip, port)
+sleep(0.5)
+
+-- 发送字符串 "1,2"
+local send_str = "1,2"
+tcp.client.send_str_data(ip, port, send_str)
+
+-- 接收并处理返回数据
+local cnt = 0
+while true do
+    local recv_str = tcp.client.recv_str_data(ip, port) or "0"
+    print("recv_str = " .. recv_str)
+
+    if recv_str ~= "0" and recv_str ~= "" then
+        local table1 = string.split(recv_str, ",")
+        print("Received:"..recv_str)
+
+        if table1[1] == "OK" then
+            set_global_variable("V_D_dx", tonumber(table1[2]))
+            set_global_variable("V_D_dy", tonumber(table1[3]))
+            set_global_variable("V_D_drz", tonumber(table1[4]))
+            set_global_variable("V_B_error", false)
+            sleep(0.1)
+            print("偏移量 X, Y 设置成功")
+            break
+        elseif table1[1] == "NG" then
+            print("No object! 收到 NG!")
+            set_global_variable("V_B_error", true)
+            break
+        end
+    else
+        cnt = cnt + 1
+        if cnt > 20 then
+            print("Receive error! 超过 20 次未收到有效数据")
+            set_global_variable("V_B_error", true)
+            break
+        end
+        sleep(1)
+    end
+end

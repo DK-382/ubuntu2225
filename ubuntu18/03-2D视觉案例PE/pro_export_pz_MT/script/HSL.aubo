@@ -1,0 +1,56 @@
+function table2str(tab)
+    local str=""
+    for i=1,#tab,1 do
+        if(i==#tab) then
+             str=str..tostring(tab[i])
+        else
+            str=str..tostring(tab[i])..","
+        end
+    end
+    return  str
+end
+
+function joint2pose(jointList,V_P)
+    local joint_str,pos_str,ori_str,pos,ori=""
+    pos,ori=base_to_user(jointList)
+    joint_str=table2str(jointList)
+    --print(joint_str)
+    pos_str=table2str(pos)
+    --print(pos_str)
+    ori_str=table2str(ori)
+    --print(ori_str)
+    set_global_variable(V_P,pos_str..","..ori_str..","..joint_str)
+    --print(pos_str..","..ori_str..","..joint_str)
+end
+
+set_joint_maxvelc({1,1,1,1,1,1})
+set_joint_maxacc({1,1,1,1,1,1})
+set_end_maxvelc(1)
+set_end_maxacc(1)
+script_common_interface("AuboVision","hvisionModel|SL.")
+script_common_interface("AuboVision", "hopenvision|")
+resp_from_camera=nil
+while (resp_from_camera ~= 1) do
+    sleep(0.05)
+    resp_from_camera = script_common_interface("AuboVision", "gethvision_status|")
+    print("resp_from_camera :"..tostring(resp_from_camera))
+    if (resp_from_camera == 0) then
+        popup_message(2, "Excessice Deviation", true)
+        break
+    end
+    if (resp_from_camera == -1) then
+        popup_message(2, "Verification Fail", true)
+        break
+    end
+    if (resp_from_camera == -2) then
+        popup_message(2, "Verification Stop", true)
+        break
+    end
+end
+sleep(0.05)
+p1=script_common_interface("AuboVision", "hposechange|-0.420926,-0.532524,0.522818,-2.85699,0.29904,2.46588")
+p2=script_common_interface("AuboVision", "hposechange|-0.420927,-0.532524,0.52282,-3.05385,0.400867,1.90572")
+
+joint2pose(p1,"V_P_W1")
+joint2pose(p2,"V_P_W2")
+

@@ -1,0 +1,19 @@
+port = 8080
+ip = "192.168.1.105"
+tcp.client.connect(ip,port)
+msg="req-taskStatus:101@agvNo:001@currentStorateCode:A01-01-01\n"
+tcp.client.send_str_data(ip,port,msg)
+while(true)do
+   str=tcp.client.recv_str_data(ip,port)
+    print(str)
+     local pos = string.find(str,"111")
+if pos then
+set_global_variable("V_B_test",true)
+else
+set_global_variable("V_B_test",false)
+break
+end
+
+sleep(1)
+end
+

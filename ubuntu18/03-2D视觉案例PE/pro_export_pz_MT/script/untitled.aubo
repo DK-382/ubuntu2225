@@ -1,0 +1,1 @@
+set_robot_io_status(RobotIOType.RobotBoardUserDI,"U_DO_01",1)

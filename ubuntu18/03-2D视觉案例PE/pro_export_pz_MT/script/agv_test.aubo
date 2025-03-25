@@ -1,0 +1,40 @@
+
+function connect(ip)
+	param = "Connection|"..ip
+	connectResult = script_common_interface("Agv", param)
+	print("connectResult : "..connectResult)
+end
+
+function disconnect()
+	disconnectResult = script_common_interface("Agv", "Disconnection")
+	print("disconnectResult : "..disconnectResult)
+end
+
+function goToLM(LM_name)
+	param = "NavigationMove|"..LM_name
+	if(connectResult == "ConnectSucceed") then
+		naviResult = script_common_interface("Agv", param)
+		print("naviResult : "..naviResult)
+
+		sleep(1)
+		i=0
+		while(i<1000) do
+			infoResult = script_common_interface("Agv", "getNavigationInfo")
+			print("infoResult : "..infoResult)
+			if(infoResult == "COMPLETED") then
+				break
+			end
+			sleep(0.1)
+			i = i+1
+		end
+	end
+end
+
+function wait(name,value)
+	while(1) do
+		if(get_global_variable(name) == value) then
+			break
+		end
+		sleep(0.01)
+	end
+end

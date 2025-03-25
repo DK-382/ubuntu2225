@@ -1,0 +1,12 @@
+tcp.client.send_str_data(ip, port, "headready")
+count = 0
+recv = ""
+while (recv == "")do
+    recv = tcp.client.recv_str_data(ip, port)
+    print("recv: "..recv)
+    sleep(0.01)
+    count = count + 0.01
+    if (count > 10) then
+        break
+    end
+end

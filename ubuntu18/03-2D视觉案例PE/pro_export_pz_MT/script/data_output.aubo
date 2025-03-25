@@ -1,0 +1,15 @@
+S_X=get_global_variable("V_D_SX")
+S_Y=get_global_variable("V_D_SY")
+
+B_X=get_global_variable("V_D_BX")
+B_Y=get_global_variable("V_D_BY")
+
+function dis2(S_X,S_Y,B_X,B_Y)
+local dis2=(S_X-B_X)^2+(S_Y-B_Y)^2
+return sqrt(dis2)
+end
+
+dis=dis2(S_X,S_Y,B_X,B_Y)
+file = io.open("coord_distance.txt","a+")
+file:write(os.date("%m/%d %H:%M"),"\t","(",B_X,",",B_Y,")","\t","(",S_X,",",S_Y,")","\t",dis,"\n")
+file:close()

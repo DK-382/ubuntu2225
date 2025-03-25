@@ -1,0 +1,121 @@
+-- 导入dkjson模块
+local json = require("dkjson")
+
+-- 从modbus获取目标的机床信息
+-- 机床类型
+-- CncType = get_modbus_io_status("VarCncType")
+CncType = 2
+-- 机床号
+CncID = get_global_variable("V_I_CNCID")
+-- 机床点位
+-- VarCellID = get_modbus_io_status("VarCellID")
+VarCellID = 1
+-- 确定模板名称
+ModelName = "CNC_"..tostring(CncType).."_"..tostring(CncID)
+-- 选择对应模板
+ModelSelectionCommand = "hvisionModel|"..ModelName.."."
+script_common_interface("AuboVision", ModelSelectionCommand)
+
+-- 调用视觉验证功能
+script_common_interface("AuboVision", "hclosevision|")
+
+-- 检验验证结果
+resp_from_camera=nil
+while (resp_from_camera ~= 1) do
+    sleep(0.05)
+    resp_from_camera = script_common_interface("AuboVision", "gethvision_status|")
+    print("resp_from_camera :"..tostring(resp_from_camera))
+    if (resp_from_camera == 0) then
+        -- 偏差过大弹窗
+        popup_message(2, "Excessice Deviation", true)
+        break
+    end
+    if (resp_from_camera == -1) then
+        -- 验证失败弹窗
+        popup_message(2, "Verification Fail", true)
+        break
+    end
+    if (resp_from_camera == -2) then
+        -- 验证停止弹窗
+        popup_message(2, "Verification Stop", true)
+        break
+    end
+end
+
+-- 加载配置文件
+file = io.open("/opt/config/VisionServoParam.json","r")
+-- 读取文件内容
+tp = file:read("*a")
+-- 关闭文件
+io.close()
+-- 解析字符串至形成table类型
+jsons = json.decode(tp)
+
+
+-- 确定目标模板, 提取目标模板中的路点
+Models = jsons["visionArucoModelParam"]
+for i=1,#Models,1 do
+    if Models[i]["key"] == ModelName then
+        Poses = Models[i]["value"]["poses"]
+        break
+    end
+end
+
+-- 确定目标路点名称, 获取目标路点数据
+TargetPoseName = "CNC_"..tostring(CncType).."_"..tostring(CncID).."_"..tostring(VarCellID)
+for i=1,#Poses,1 do
+     if Poses[i]["name"] == TargetPoseName then
+         TargetPose = Poses[i]["pose"]
+         break
+     end
+end
+
+-- 将table类型的TargetPose拼接为字符串
+TargetPoseStr = ""
+for i=1,#TargetPose,1 do
+    if i == #TargetPose then
+        TargetPoseStr = TargetPoseStr..tostring(TargetPose[i])
+    else
+        TargetPoseStr = TargetPoseStr..tostring(TargetPose[i]).."," 
+    end
+end
+
+-- 获取位姿变化值
+HPoseChangeCommand ="hposechange|"..TargetPoseStr
+VisionResult = script_common_interface("AuboVision", HPoseChangeCommand)
+
+-- 设置机械臂运动参数
+set_joint_maxvelc({1,1,1,1,1,1})
+set_joint_maxacc({1,1,1,1,1,1})
+set_end_maxvelc(1)
+set_end_maxacc(1)
+
+-- 通过相对偏移方式运动至目标点位上方
+--set_relative_offset({0, 0, 0.06})
+set_relative_offset({-0.014, -0.003, 0.06},{1,0,0.03,0})
+--CoordCalibrateMethod.zOzy({1,0,0})
+move_joint(VisionResult,true)
+-- 运动至目标点
+set_relative_offset({-0.014, -0.003, 0},{1,0,0.03,0})
+move_line(VisionResult,true)
+sleep(0.5)
+-- 末端执行器操作，例如通过用户DO5控制
+ set_robot_io_status(RobotIOType.RobotBoardUserDO, "U_DO_05", 1)
+script_common_interface("JODELL_Tools", "1|RG|RG52_050|Close")
+sleep(0.5)
+
+-- 通过相对偏移方式运动至目标点位上方
+set_relative_offset({-0.014, -0.003, 0.06},{1,0,0.03,0})
+move_line(VisionResult,true)
+
+
+-- 运动至目标点
+--set_relative_offset({0, 0, 0})
+--move_line(VisionResult,true)
+-- 末端执行器操作，例如通过用户DO5控制
+-- set_robot_io_status(RobotIOType.RobotBoardUserDO, "U_DO_05", 1)
+--script_common_interface("JODELL_Tools", "1|RG|RG52_050|Close")
+--sleep(0.5)
+-- 通过相对偏移方式运动至目标点位上方
+--set_relative_offset({0, 0, 0.06})
+--move_line(VisionResult,true)

@@ -1,0 +1,14 @@
+--cpstr="0,0,0,0,0,0,0"
+num=get_global_variable("V_I_num")
+print(num)
+cp={"-0.270594,-0.121499,0.547598,0.000000,0.707109,-0.707105,0.000000,-0.000004,-0.421380,-1.520677,0.471500,-1.570796,-0.000009","-0.270594,-0.121499,0.547598,0.000000,0.707109,-0.707105,0.000000,-0.000004,-0.421380,-1.520677,0.471500,-1.570796,-0.000009"}
+tp={0,0,0,0,0,0}
+--cpstr=cpstr..","..tostring(tp[num])
+cpstr=tostring(cp[num])
+print("cwp:"..cpstr)
+set_global_variable("V_P_final",cpstr)
+if num<2 then
+	num=num+1
+else num=1
+end
+set_global_variable("V_I_num",num)

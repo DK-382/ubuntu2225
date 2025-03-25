@@ -1,0 +1,6 @@
+port=8080
+ip="192.168.26.216"
+tcp.client.connect(ip,port)
+var1
+tcp.client.send_str_data(ip,port,var1)
+ str1= tcp.client.recv_str_data(ip,port)

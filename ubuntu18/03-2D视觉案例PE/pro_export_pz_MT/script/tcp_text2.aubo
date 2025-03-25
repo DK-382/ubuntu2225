@@ -1,0 +1,2 @@
+msg="102,1"
+	tcp.client.send_str_data(ip,port,msg)

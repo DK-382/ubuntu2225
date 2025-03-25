@@ -1,0 +1,3 @@
+port = 8080
+ip = "192.168.26.216"
+tcp.client.connect(ip,port)

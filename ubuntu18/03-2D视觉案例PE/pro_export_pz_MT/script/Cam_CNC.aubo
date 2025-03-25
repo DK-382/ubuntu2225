@@ -1,0 +1,158 @@
+--分割字符串函数
+function string.split(str,delimiter)
+	if str  ==  nil or str ==  ''  or  delimiter  == nil then
+			return  nil
+	end
+	local  result =  {}
+	for match in  (str..delimiter):gmatch("(.-)"..delimiter) do
+			table.insert(result,match)
+	end
+	return result
+end
+--定义函数，把变量点赋值给示教器程序变量路点
+function set_tp(pname,tp)
+	cpstr="0,0,0,0,0,0,0"
+	for i=1,6,1 do
+		cpstr=cpstr..","..tostring(tp[i])
+	end
+	print("cwp:"..cpstr)
+	set_global_variable(pname,cpstr)
+end
+--定义一个表格，用以存放分割后的相机所发送的坐标
+recv_str = "1"
+local table  = {}
+table_pose = {0,0,0}
+table_ori = {0,0,0,0}
+table_rpy = {0,0,0}
+ip="192.168.192.101"--相机（server）IP
+port=50000--相机（server）端口
+tcp.client.connect(ip,port) --连接相机（server）
+pose = get_current_waypoint()
+table_pose[1] = pose.pos.x * 1000
+table_pose[2] = pose.pos.y * 1000
+table_pose[3] = pose.pos.z * 1000
+table_ori[1] = pose.ori.w
+table_ori[2] = pose.ori.x
+table_ori[3] = pose.ori.y
+table_ori[4] = pose.ori.z
+table_rpy = quaternion2rpy(table_ori)
+pos_str="101,2,0,2" --CNC
+for i=1,3,1 do
+	pos_str=pos_str..","..tostring(table_pose[i])
+end
+for i=1,3,1 do
+	pos_str=pos_str..","..tostring(r2d(table_rpy[i]))
+end
+print("pos_str = "..pos_str)
+print("pos_str = "..pos_str)
+while (1) do
+	recv_str = "1"
+	tcp.client.send_str_data(ip,port,pos_str)
+	recv_str=tcp.client.recv_str_data(ip,port)
+	cnt=0
+	print("recv_str = "..recv_str)
+	while (recv_str==nil or recv_str=='' or recv_str=="1") do    
+		sleep(0.5)
+	     cnt = cnt+1
+		if cnt>20 then
+			cnt=0
+			print("Receive error !")
+			break
+		end
+		recv_str = tcp.client.recv_str_data(ip,port)
+		print("recv_str = "..recv_str)
+	end
+	if(recv_str == "NG") then
+		print("no object!")
+	else
+		--table1 = string.split(recv_str,",")
+		print("recv_str = "..recv_str)
+		break
+	end
+	--table1 = string.split(recv_str,";")
+	--print("recv_str = "..recv_str)
+end
+
+while (1) do
+	recv_str = "1"
+	tcp.client.send_str_data(ip,port,"102,2")
+	recv_str=tcp.client.recv_str_data(ip,port)
+	cnt=0
+	print("recv_str = "..recv_str)
+	while (recv_str==nil or recv_str=='' or recv_str=="1") do    
+		sleep(0.5)
+	     cnt = cnt+1
+		if cnt>20 then
+			cnt=0
+			print("Receive error !")
+			break
+		end
+		recv_str = tcp.client.recv_str_data(ip,port)
+		print("recv_str = "..recv_str)
+	end
+	if(recv_str == "NG") then
+		print("no object!")
+	else
+		table = string.split(recv_str,",")
+		--print("recv_str = "..recv_str)
+		break
+	end
+	--table = string.split(recv_str,";")
+	print("recv_str = "..recv_str)
+end
+print("CCD Pos")
+num = table[4] --points num
+print("num = "..num) 
+--print("table6 = "..table[6])
+--print("table7 = "..table[7])
+--print("table8 = "..table[8])
+--print("table9 = "..table[9])
+--print("table10 = "..table[10])
+--print("table11 = "..table[11])
+
+pos_tmp = {0,0,0}
+rpy_tmp = {0,0,0}
+ori_tmp = {0,0,0,0}
+tool_pos = {0,0,0}
+tool_ori = rpy2quaternion({0,0,0})
+for i = 0, num - 1, 1 do
+	x = tonumber(table[6 + i * 8]) / 1000 
+	y = tonumber(table[7 + i * 8]) / 1000
+	z = tonumber(table[8 + i * 8]) / 1000
+	Rx = d2r(tonumber(table[9 + i * 8]))
+	Ry = d2r(tonumber(table[10 + i * 8]))
+	Rz = d2r(tonumber(table[11 + i * 8]))
+	print("i = "..i)
+	print("wp = "..x..","..y..","..z..","..tonumber(table[9 + i * 8])..","..tonumber(table[10 + i * 8])..","..tonumber(table[9 + i * 8]))
+	pos_tmp = {x,y,z}
+	rpy_tmp = {Rx,Ry,Rz}
+	ori_tmp = rpy2quaternion(rpy_tmp)
+	print("ori_tmp = "..ori_tmp[1]..","..ori_tmp[2]..","..ori_tmp[3]..","..ori_tmp[4]..",")
+	if i == 0 then
+		tp_up=get_target_pose({pos_tmp[1],pos_tmp[2],pos_tmp[3] + 0.007}, ori_tmp,false,tool_pos,tool_ori)--逆解工具坐标系在base坐标系下的位置和姿态
+		tp=get_target_pose({pos_tmp[1],pos_tmp[2],pos_tmp[3]}, ori_tmp,false,tool_pos,tool_ori)--逆解工具坐标系在base坐标系下的位置和姿态
+		set_tp("V_P_CNC_pick_mid",tp_up)--up点
+		set_tp("V_P_CNC_pick_low",tp)		
+	end
+	if i == 1 then
+		tp_up=get_target_pose({pos_tmp[1],pos_tmp[2],pos_tmp[3] + 0.007}, ori_tmp,false,tool_pos,tool_ori)--逆解工具坐标系在base坐标系下的位置和姿态
+		tp=get_target_pose({pos_tmp[1],pos_tmp[2],pos_tmp[3] + 0.003}, ori_tmp,false,tool_pos,tool_ori)--逆解工具坐标系在base坐标系下的位置和姿态
+		set_tp("V_P_CNC_put_mid",tp_up)--up点
+		set_tp("V_P_CNC_put_low",tp)
+
+	end
+	if i == 2 then
+		tp_up=get_target_pose({pos_tmp[1],pos_tmp[2],pos_tmp[3] + 0.05}, ori_tmp,false,tool_pos,tool_ori)--逆解工具坐标系在base坐标系下的位置和姿态
+		tp=get_target_pose({pos_tmp[1],pos_tmp[2],pos_tmp[3] - 0.015}, ori_tmp,false,tool_pos,tool_ori)--逆解工具坐标系在base坐标系下的位置和姿态
+		set_tp("V_P_CNC_pick_mid_r",tp)--up点
+		set_tp("V_P_CNC_pick_high",tp_up)
+	end
+	if i == 3 then
+		tp_up=get_target_pose({pos_tmp[1],pos_tmp[2],pos_tmp[3] + 0.05}, ori_tmp,false,tool_pos,tool_ori)--逆解工具坐标系在base坐标系下的位置和姿态
+		tp=get_target_pose({pos_tmp[1],pos_tmp[2],pos_tmp[3] - 0.015}, ori_tmp,false,tool_pos,tool_ori)--逆解工具坐标系在base坐标系下的位置和姿态
+		set_tp("V_P_CNC_put_mid_r",tp)--up点
+		set_tp("V_P_CNC_put_high",tp_up)
+	end
+
+end
+tcp.client.disconnect(ip,port)

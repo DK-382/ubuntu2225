@@ -1,0 +1,6 @@
+local path = "/root/auborobotstudio/robotstudio/teachpendant/share/teachpendant/script/"
+local filename = path.."data.txt"
+
+file = io.open(filename,"a")
+file:write("AGV "..tostring(os.date("%X")).."\n")
+file:close()

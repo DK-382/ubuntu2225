@@ -1,0 +1,200 @@
+--Procedure Program
+
+--block script function definition
+  function blockScriptFunc_拍照通信交互()
+    -- 分割字符串函数
+    function string.split(str, delimiter)
+        if not str or str == "" or not delimiter then return nil end
+        local result = {}
+        for match in (str .. delimiter):gmatch("(.-)" .. delimiter) do
+            table.insert(result, match)
+        end
+        return result
+    end
+    
+    -- 通讯 IP 与端口设置
+    local port = 6000
+    local ip = "192.168.80.122"
+    
+    -- 连接服务器
+    tcp.client.connect(ip, port)
+    sleep(0.5)
+    
+    -- 发送字符串 "1,2"
+    local send_str = "1,2"
+    tcp.client.send_str_data(ip, port, send_str)
+    
+    -- 接收并处理返回数据
+    local cnt = 0
+    while true do
+        local recv_str = tcp.client.recv_str_data(ip, port) or "0"
+        print("recv_str = " .. recv_str)
+    
+        if recv_str ~= "0" and recv_str ~= "" then
+            local table1 = string.split(recv_str, ",")
+            print("Received:"..recv_str)
+    
+            if table1[1] == "OK" then
+                set_global_variable("V_D_dx", tonumber(table1[2]))
+                set_global_variable("V_D_dy", tonumber(table1[3]))
+                set_global_variable("V_D_drz", tonumber(table1[4]))
+                set_global_variable("V_B_error", false)
+                sleep(0.1)
+                print("偏移量 X, Y 设置成功")
+                break
+            elseif table1[1] == "NG" then
+                print("No object! 收到 NG!")
+                set_global_variable("V_B_error", true)
+                break
+            end
+        else
+            cnt = cnt + 1
+            if cnt > 20 then
+                print("Receive error! 超过 20 次未收到有效数据")
+                set_global_variable("V_B_error", true)
+                break
+            end
+            sleep(1)
+        end
+    end
+  end  --function blockScriptFunc_拍照通信交互()
+
+--script function definition
+  function ifScriptFunc_0()
+    --(Logic tree item : Message) Message
+    set_current_logic_tree_item("a2f712dfc1a1429ab9e9196379b2c945")
+    popup_message(1, "paizhao-error", true)
+  end
+
+--(Logic tree item : Procedure_Program) Procedure_Program
+  --(Logic tree item : Set) Set_dz
+  set_current_logic_tree_item("f9ed0af7a5d843a59ad9a977b357055d")
+  set_global_variable("V_D_dz", 0.1)
+  --(Logic tree item : Empty) Empty
+  --(Logic tree item : Wait) Wait1
+  set_current_logic_tree_item("7f67097be2af45cb9e5762cb47ec4d53")
+  sleep(1)
+  set_step_breakpoint()
+  --(Logic tree item : Move) go_home
+  init_global_move_profile()
+  set_joint_maxvelc({1.946042,1.946042,1.946042,2.068215,2.068215,2.068215})
+  set_joint_maxacc({15.550884,15.550884,15.550884,19.390608,19.390608,19.390608})
+    --(Logic tree item : Waypoint) home
+    set_current_logic_tree_item("17d8675b24e34bb7b250c6b1079fcb0c")
+    move_joint({-0.000003, -0.127267, -1.321122, 0.376934, -1.570796, -0.000008}, true)
+    set_step_breakpoint()
+  --(Logic tree item : Move) guodu
+  init_global_move_profile()
+  set_joint_maxvelc({1.167625,1.167625,1.167625,1.240929,1.240929,1.240929})
+  set_joint_maxacc({9.330530,9.330530,9.330530,11.634365,11.634365,11.634365})
+    --(Logic tree item : Waypoint) Waypoint_V_P_gdd1
+    set_current_logic_tree_item("33c4e82590e5432d8a8b9262658ff519")
+    move_joint(get_global_variable("V_P_gdd1"), true)
+    set_step_breakpoint()
+  --(Logic tree item : Move) paizhao
+  init_global_move_profile()
+  set_joint_maxvelc({1.167625,1.167625,1.167625,1.240929,1.240929,1.240929})
+  set_joint_maxacc({9.330530,9.330530,9.330530,11.634365,11.634365,11.634365})
+    --(Logic tree item : Waypoint) Waypoint_V_P_paizhao1
+    set_current_logic_tree_item("b7feee7e634542d886c64d529a76b81a")
+    move_joint(get_global_variable("V_P_paizhao1"), true)
+    set_step_breakpoint()
+  --(Logic tree item : Wait) Wait1
+  set_current_logic_tree_item("d5f4ac984cdc4f7197df773c5b3b9520")
+  sleep(1.5)
+  set_step_breakpoint()
+  --(Logic tree item : Script) 拍照通信交互
+  set_current_logic_tree_item("ffcb68aaaa324361a071c6d2d193bb27")
+  blockScriptFunc_拍照通信交互()
+  set_step_breakpoint()
+  --(Logic tree item : If) If_error
+  if (get_global_variable("V_B_error") == true) then
+    ifFuncRet = ifScriptFunc_0()
+    if (ifFuncRet ~= nil) then
+      do return ifFuncRet end
+    end
+  end
+  --(Logic tree item : Block_Comment) get
+  --get_wuliao
+    --(Logic tree item : Move) guodu
+    init_global_move_profile()
+    set_joint_maxvelc({1.167625,1.167625,1.167625,1.240929,1.240929,1.240929})
+    set_joint_maxacc({9.330530,9.330530,9.330530,11.634365,11.634365,11.634365})
+      --(Logic tree item : Waypoint) Waypoint_V_P_gdd2
+      set_current_logic_tree_item("3b60571ad0fe41bca5a5da0afebc616f")
+      move_joint(get_global_variable("V_P_gdd2"), true)
+      set_step_breakpoint()
+    --(Logic tree item : Move) up_1
+    init_global_move_profile()
+    set_end_maxvelc(0.480000)
+    set_end_maxacc(1.500000)
+    set_relative_offset({get_global_variable("V_D_dx"), get_global_variable("V_D_dy"), get_global_variable("V_D_dz")}, rpy2quaternion({d2r(0), d2r(0), d2r(get_global_variable("V_D_drz"))}))
+      --(Logic tree item : Waypoint) Waypoint_V_P_get1
+      set_current_logic_tree_item("816a2c5855d642e581592cb968d5dc72")
+      move_line(get_global_variable("V_P_get1"), true)
+      set_step_breakpoint()
+    --(Logic tree item : Move) get_1
+    init_global_move_profile()
+    set_end_maxvelc(0.480000)
+    set_end_maxacc(1.500000)
+    set_relative_offset({get_global_variable("V_D_dx"), get_global_variable("V_D_dy"), 0}, rpy2quaternion({d2r(0), d2r(0), d2r(get_global_variable("V_D_drz"))}))
+      --(Logic tree item : Waypoint) Waypoint_V_P_get1
+      set_current_logic_tree_item("4b0a9f4d380d454db23c3c0dc0d84634")
+      move_line(get_global_variable("V_P_get1"), true)
+      set_step_breakpoint()
+    --(Logic tree item : Empty) Empty
+    --(Logic tree item : Move) up_1
+    init_global_move_profile()
+    set_end_maxvelc(0.480000)
+    set_end_maxacc(1.000000)
+    set_relative_offset({get_global_variable("V_D_dx"), get_global_variable("V_D_dy"), get_global_variable("V_D_dz")}, rpy2quaternion({d2r(0), d2r(0), d2r(get_global_variable("V_D_drz"))}))
+      --(Logic tree item : Waypoint) Waypoint_V_P_get1
+      set_current_logic_tree_item("d36048cdec9e4c4799e857e0bfbf5096")
+      move_line(get_global_variable("V_P_get1"), true)
+      set_step_breakpoint()
+  --(Logic tree item : Block_Comment) put
+  --put_wuliao
+    --(Logic tree item : Move) guodu
+    init_global_move_profile()
+    set_joint_maxvelc({1.167625,1.167625,1.167625,1.240929,1.240929,1.240929})
+    set_joint_maxacc({9.330530,9.330530,9.330530,11.634365,11.634365,11.634365})
+      --(Logic tree item : Waypoint) Waypoint_V_P_gdd2
+      set_current_logic_tree_item("f06a2615cd724e5f95f762dd2737a79a")
+      move_joint(get_global_variable("V_P_gdd2"), true)
+      set_step_breakpoint()
+    --(Logic tree item : Move) up_2
+    init_global_move_profile()
+    set_joint_maxvelc({1.167625,1.167625,1.167625,1.240929,1.240929,1.240929})
+    set_joint_maxacc({9.330530,9.330530,9.330530,11.634365,11.634365,11.634365})
+    set_relative_offset({0, 0, get_global_variable("V_D_dz")}, rpy2quaternion({d2r(0), d2r(0), d2r(0)}))
+      --(Logic tree item : Waypoint) Waypoint_V_P_put1
+      set_current_logic_tree_item("209009dc97144eac8db2cd9b9fef2271")
+      move_joint(get_global_variable("V_P_put1"), true)
+      set_step_breakpoint()
+    --(Logic tree item : Move) put_1
+    init_global_move_profile()
+    set_end_maxvelc(0.480000)
+    set_end_maxacc(1.000000)
+      --(Logic tree item : Waypoint) Waypoint_V_P_put1
+      set_current_logic_tree_item("e08baf2f021740688a7b623cda4293ee")
+      move_line(get_global_variable("V_P_put1"), true)
+      set_step_breakpoint()
+    --(Logic tree item : Move) up_2
+    init_global_move_profile()
+    set_end_maxvelc(0.480000)
+    set_end_maxacc(1.000000)
+    set_relative_offset({0, 0, get_global_variable("V_D_dz")}, rpy2quaternion({d2r(0), d2r(0), d2r(0)}))
+      --(Logic tree item : Waypoint) Waypoint_V_P_put1
+      set_current_logic_tree_item("d6876c4a2b7843bfaddd0db8b6fcc6e4")
+      move_line(get_global_variable("V_P_put1"), true)
+      set_step_breakpoint()
+    --(Logic tree item : Empty) Empty
+    --(Logic tree item : Empty) Empty
+  --(Logic tree item : Move) go_home
+  init_global_move_profile()
+  set_joint_maxvelc({1.946042,1.946042,1.946042,2.068215,2.068215,2.068215})
+  set_joint_maxacc({15.550884,15.550884,15.550884,19.390608,19.390608,19.390608})
+    --(Logic tree item : Waypoint) home
+    set_current_logic_tree_item("5b3477b898474c14989bd43294a5ced4")
+    move_joint({-0.000003, -0.127267, -1.321122, 0.376934, -1.570796, -0.000008}, true)
+    set_step_breakpoint()
