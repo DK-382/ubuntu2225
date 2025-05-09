@@ -1,0 +1,115 @@
+local socket = require("socket")
+local http = require("socket.http")
+local ltn12 = require("ltn12")
+local json = require("dkjson")
+
+-- 通用 HTTP 请求函数（GET / POST）
+local function send_http_request(url, method, post_data)
+    assert(url and type(url) == "string", "Invalid URL")
+
+    local headers = {
+        ["Content-Type"] = "application/json"
+    }
+
+    local post_data_json = ""
+    if method == "POST" then
+        assert(type(post_data) == "table", "Invalid POST data")
+        post_data_json = json.encode(post_data)
+        headers["Content-Length"] = tostring(#post_data_json)
+    end
+
+    local response_body = {}
+    local success, response_code, response_headers, response_status
+
+    success, response_code, response_headers, response_status = pcall(function()
+        return http.request{
+            url = url,
+            method = method,
+            headers = headers,
+            source = ltn12.source.string(post_data_json),
+            sink = ltn12.sink.table(response_body)
+        }
+    end)
+
+    local response_content = table.concat(response_body)
+
+    return {
+        success = success,
+        code = response_code,
+        headers = response_headers,
+        status = response_status,
+        content = response_content
+    }
+end
+
+-- 解码 JSON 响应体
+local function decode_json(content)
+    local ok, result = pcall(json.decode, content)
+    if ok and type(result) == "table" then
+        return result
+    else
+        return nil, "JSON 解析失败"
+    end
+end
+
+-- GET 请求处理
+local function send_get_request(url)
+    print("\n===> 发送 GET 请求到: " .. url)
+    local res = send_http_request(url, "GET")
+
+    if not res.success then
+        print("[错误] GET 请求执行失败")
+        return
+    end
+
+    print("状态码:", res.code or "未知")
+    print("原始内容:", res.content or "无")
+
+    local data, err = decode_json(res.content)
+    if data then
+        print("解析成功:")
+        print(json.encode(data, { indent = true }))
+    else
+        print("[解析失败]", err)
+    end
+end
+
+-- POST 请求处理
+local function send_post_request(url, post_data)
+    print("\n===> 发送 POST 请求到: " .. url)
+    print("POST 数据:")
+    print(json.encode(post_data, { indent = true }))
+
+    local res = send_http_request(url, "POST", post_data)
+
+    if not res.success then
+        print("[错误] POST 请求执行失败")
+        return
+    end
+
+    print("状态码:", res.code or "未知")
+    print("原始内容:", res.content or "无")
+
+    local data, err = decode_json(res.content)
+    if data then
+        print("解析成功:")
+        print(json.encode(data, { indent = true }))
+    else
+        print("[解析失败]", err)
+    end
+end
+
+-- 示例测试
+local test_url = "http://192.168.80.1:8000/api"
+local post_data = {
+    client = "Ubuntu Lua Client",
+    timestamp = os.date("%Y-%m-%d %H:%M:%S"),
+    data = {
+        temperature = 24.5,
+        humidity = 60
+    }
+}
+
+send_post_request(test_url, post_data)
+send_get_request(test_url)
+--http 简化
