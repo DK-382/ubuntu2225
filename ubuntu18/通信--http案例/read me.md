@@ -27,8 +27,9 @@ print("LuaSocket version: " .. socket._VERSION)
 print("LTN12 version: " .. ltn12._VERSION)
 
 ---
-
+http://192.168.66.1:8000/api
 http://192.168.80.1:8000/api
 http://172.16.9.208:8000/api
+
 ipconfig /ip a同网络下所有的都可以监控到状态更新
 再然后就是处理json文件和其他相关数据分析了
