@@ -1,0 +1,52 @@
+local https = require("ssl.https")
+local ltn12 = require("ltn12")
+local json = require("dkjson")
+
+-- HTTPS POST 请求封装
+local function https_post(url, data)
+    local request_body = json.encode(data or {})
+    local response_body = {}
+
+    local res, code, headers, status = https.request{
+        url = url,
+        method = "POST",
+        protocol = "tlsv1_2",  -- 强制使用 TLS 1.2 协议
+        verify = "none",  -- 跳过自签名证书验证
+        options = "all",
+        headers = {
+            ["Content-Type"] = "application/json",
+            ["Content-Length"] = tostring(#request_body)
+        },
+        source = ltn12.source.string(request_body),
+        sink = ltn12.sink.table(response_body)
+    }
+
+    -- 获取完整的响应体
+    local full_body = table.concat(response_body)
+
+    -- 打印响应状态码
+    print("响应状态码:", code or "NIL")
+
+    -- 打印响应内容
+    print("响应原文:", full_body)
+
+    -- 尝试解析 JSON 响应内容
+    local ok, decoded = pcall(json.decode, full_body)
+    if ok and decoded then
+        -- 如果 JSON 解码成功，打印解析结果
+        print("✅ JSON 解码成功:\n", json.encode(decoded, { indent = true }))
+    else
+        -- 如果解码失败，输出错误信息
+        print("❌ JSON 解码失败，内容可能不是合法 JSON")
+    end
+end
+
+-- 示例调用
+local url = "https://192.168.80.1:8000/api"  -- 确保 Flask 用的是 HTTPS + 这个地址
+local payload = {
+    client = "LuaSec Test Client",
+    timestamp = os.date("%Y-%m-%d %H:%M:%S"),
+    data = { temperature = 24.3, humidity = 60 }
+}
+
+https_post(url, payload)
