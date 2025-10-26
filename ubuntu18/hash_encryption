@@ -1,0 +1,46 @@
+import hashlib
+
+# 假设已知的激活码和 MAC 地址
+mac_address = "00:0C:29:D7:2A:CD"  # 已知的 MAC 地址
+known_activation_code = "808B233D-FE53C752-BC25A1E9"  # 已知的激活码
+
+# 生成激活码的函数
+def generate_activation_code(mac_address, salt):
+    # 去掉 MAC 地址中的冒号并转为大写
+    mac_clean = mac_address.replace(":", "").upper()
+    
+    # 拼接 MAC 地址和盐值
+    combined = mac_clean + salt.upper()
+    
+    # 计算 MD5 哈希
+    md5_hash = hashlib.md5(combined.encode()).hexdigest().upper()
+    
+    # 按 8 位分割成 3 组
+    part1, part2, part3 = md5_hash[:8], md5_hash[8:16], md5_hash[16:24]
+    
+    # 拼接格式化激活码
+    activation_code = f"{part1}-{part2}-{part3}"
+    return activation_code
+
+# 穷举法反推盐值
+def reverse_salt(mac_address, known_activation_code):
+    # 假设盐值在字母和数字范围内，并且长度在一定范围内
+    possible_salts = ["SALT123", "TEST456", "ABCDEF01", "12345678", "QWERTYUI", "PASSWORD", "1234abcd"]
+    
+    for salt in possible_salts:
+        # 生成激活码
+        generated_code = generate_activation_code(mac_address, salt)
+        
+        # 比较生成的激活码与已知激活码
+        if generated_code == known_activation_code:
+            return salt
+    
+    return None
+
+# 反推盐值
+salt_found = reverse_salt(mac_address, known_activation_code)
+
+if salt_found:
+    print(f"找到匹配的盐值: {salt_found}")
+else:
+    print("未找到匹配的盐值。")
